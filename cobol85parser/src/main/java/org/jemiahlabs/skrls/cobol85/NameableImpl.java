@@ -1,8 +1,8 @@
-package org.jemiahlabs.skrls.plugin;
+package org.jemiahlabs.skrls.cobol85;
 
 import org.jemiahlabs.skrls.core.Nameable;
 
-public class NameableImpl2 implements Nameable {
+public class NameableImpl implements Nameable {
 
 	@Override
 	public String getNameProduct() {
@@ -16,7 +16,7 @@ public class NameableImpl2 implements Nameable {
 
 	@Override
 	public String getTargetLanguage() {
-		return "COBOL";
+		return "COBOL85";
 	}
 
 	@Override
