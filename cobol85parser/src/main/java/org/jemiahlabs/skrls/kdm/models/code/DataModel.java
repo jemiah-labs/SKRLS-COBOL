@@ -3,12 +3,14 @@ package org.jemiahlabs.skrls.kdm.models.code;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jemiahlabs.skrls.kdm.models.XmiEntity;
+
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
 
-@XStreamAlias("dataModel") 
-public class DataModel {
+@XStreamAlias("model") 
+public class DataModel extends XmiEntity {
 	@XStreamAsAttribute
 	private String name;
 	@XStreamImplicit
@@ -16,6 +18,7 @@ public class DataModel {
 	
 	public DataModel() {
 		dataElements = new ArrayList<DataElement>();
+		setType("data:DataModel");
 	}
 	
 	public String getName() {

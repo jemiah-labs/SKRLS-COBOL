@@ -1,13 +1,12 @@
 package org.jemiahlabs.skrls.kdm.models.code;
 
+import org.jemiahlabs.skrls.kdm.models.XmiEntity;
+
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
-import com.thoughtworks.xstream.annotations.XStreamConverter;
-import com.thoughtworks.xstream.converters.extended.ToAttributedValueConverter;
 
 @XStreamAlias("valueElement")
-@XStreamConverter(value=ToAttributedValueConverter.class, strings={"value"})
-public class ValueElement {
+public class ValueElement extends XmiEntity {
 	@XStreamAsAttribute
 	private String value;
 	@XStreamAsAttribute
