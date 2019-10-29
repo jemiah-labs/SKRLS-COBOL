@@ -32,6 +32,7 @@ public class KDMSegment {
 	@XStreamAsAttribute 
 	private String name;
 	
+	@XStreamAlias("model")
 	private DataModel dataModel;
 	private CodeModel codemodel;
 	

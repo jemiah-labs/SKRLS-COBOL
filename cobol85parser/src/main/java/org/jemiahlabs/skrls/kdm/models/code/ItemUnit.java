@@ -12,13 +12,13 @@ public class ItemUnit extends XmiEntity {
 	@XStreamAsAttribute
 	private String ext;
 	@XStreamAsAttribute
-	private int size;
+	private String size;
 	
 	private ValueElement valueElement;
 	
-	public ItemUnit(String name, int size) {
+	public ItemUnit(String name, String ext) {
 		this.name = name;
-		this.size = size;
+		this.ext = ext;
 	}
 	
 	public ItemUnit(String name, ValueElement valueElement) {
@@ -50,11 +50,11 @@ public class ItemUnit extends XmiEntity {
 		this.ext = ext;
 	}
 
-	public int getSize() {
+	public String getSize() {
 		return size;
 	}
 
-	public void setSize(int size) {
+	public void setSize(String size) {
 		this.size = size;
 	}
 }

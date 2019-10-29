@@ -5,11 +5,9 @@ import java.util.List;
 
 import org.jemiahlabs.skrls.kdm.models.XmiEntity;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
 
-@XStreamAlias("model") 
 public class DataModel extends XmiEntity {
 	@XStreamAsAttribute
 	private String name;
