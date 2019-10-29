@@ -29,7 +29,7 @@ public class CobolKdmMapper {
 		return model;
 	}
 	
-	public void handlerDivision(Class<? extends DivisionHandler> handlerDefinition) {
+	public void addHandlerDefinition(Class<? extends DivisionHandler> handlerDefinition) {
 		if(handlerStart == null) {
 			handlerStart = resolvehandler(handlerDefinition);
 			handlerEnd = handlerStart;
