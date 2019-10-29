@@ -22,13 +22,11 @@ public class LinkedIterator<T> implements Iterator<T> {
 		if(indexCurrent == size) 
 			return null;
 		
-		return nodes.get(++indexCurrent);
+		return nodes.get(indexCurrent++);
 	}
 
 	@Override
 	public T next() {
 		return nodes.get(indexCurrent + 1);
 	}
-	
-	
 }
