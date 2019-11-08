@@ -3,12 +3,14 @@ package org.jemiahlabs.skrls.kdm.models.code;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jemiahlabs.skrls.kdm.models.XmiEntity;
+
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
 
-@XStreamAlias("codeModel") 
-public class CodeModel {
+@XStreamAlias("model")
+public class CodeModel extends XmiEntity {
 	@XStreamAsAttribute
 	private String name;
 	@XStreamImplicit

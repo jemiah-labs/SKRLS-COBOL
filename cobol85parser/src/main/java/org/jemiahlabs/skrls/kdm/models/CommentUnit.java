@@ -1,6 +1,11 @@
 package org.jemiahlabs.skrls.kdm.models;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+
+@XStreamAlias("commentUnit")
 public class CommentUnit {
+	@XStreamAsAttribute
 	public String text;
 	
 	public CommentUnit(String text) {

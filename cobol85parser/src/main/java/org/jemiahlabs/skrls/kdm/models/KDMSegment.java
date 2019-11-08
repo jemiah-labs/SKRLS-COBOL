@@ -1,10 +1,14 @@
 package org.jemiahlabs.skrls.kdm.models;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.jemiahlabs.skrls.kdm.models.code.CodeModel;
 import org.jemiahlabs.skrls.kdm.models.code.DataModel;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+import com.thoughtworks.xstream.annotations.XStreamImplicit;
 
 @XStreamAlias("kdm:Segment")
 public class KDMSegment {
@@ -34,10 +38,11 @@ public class KDMSegment {
 	
 	@XStreamAlias("model")
 	private DataModel dataModel;
-	private CodeModel codemodel;
+	@XStreamImplicit
+	private List<CodeModel> codeModels;
 	
 	public KDMSegment() {
-		
+		codeModels = new ArrayList<CodeModel>();
 	}
 
 	public String getName() {
@@ -55,12 +60,13 @@ public class KDMSegment {
 	public void setDataModel(DataModel dataModel) {
 		this.dataModel = dataModel;
 	}
-
-	public CodeModel getCodemodel() {
-		return codemodel;
+	
+	public void addCodeModel(CodeModel codeModel) {
+		codeModels.add(codeModel);
+	}
+	
+	public List<CodeModel> getCodemodel() {
+		return codeModels;
 	}
 
-	public void setCodemodel(CodeModel codemodel) {
-		this.codemodel = codemodel;
-	}
 }

@@ -11,12 +11,15 @@ import org.jemiahlabs.skrls.kdm.models.code.DataModel;
 import org.jemiahlabs.skrls.kdm.models.code.ItemUnit;
 import org.jemiahlabs.skrls.kdm.models.code.StorableKind;
 import org.jemiahlabs.skrls.kdm.models.code.StorableUnit;
+import org.jemiahlabs.skrls.kdm.models.code.ValueElement;
 import org.jemiahlabs.skrls.kdm.models.util.LinkedIterator;
 
 import io.proleap.cobol.asg.metamodel.CompilationUnit;
 import io.proleap.cobol.asg.metamodel.data.DataDivision;
 import io.proleap.cobol.asg.metamodel.data.datadescription.DataDescriptionEntry;
 import io.proleap.cobol.asg.metamodel.data.datadescription.DataDescriptionEntryGroup;
+import io.proleap.cobol.asg.metamodel.data.datadescription.PictureClause;
+import io.proleap.cobol.asg.metamodel.data.datadescription.ValueClause;
 import io.proleap.cobol.asg.metamodel.data.file.FileDescriptionEntry;
 import io.proleap.cobol.asg.metamodel.data.file.FileSection;
 import io.proleap.cobol.asg.metamodel.data.linkage.LinkageSection;
@@ -37,8 +40,12 @@ public class DataDivisionHandler extends DivisionHandler {
 	public void process(CompilationUnit compilationUnit, KDMSegment model) {
 		getProducerMessage().emitInfoMessage("Data Division Extracting.");
 		
-		DataModel dataModel = createDataModel(compilationUnit.getProgramUnit().getDataDivision());
-		model.setDataModel(dataModel);
+		DataDivision dataDivision = compilationUnit.getProgramUnit().getDataDivision();
+		
+		if(dataDivision != null) {
+			DataModel dataModel = createDataModel(dataDivision);
+			model.setDataModel(dataModel);
+		}
 		
 		if(isNextHandler())
 			getNextHandler().process(compilationUnit, model);
@@ -166,7 +173,7 @@ public class DataDivisionHandler extends DivisionHandler {
 	
 	private ItemUnit createItemUnit(DataDescriptionEntry dataDescriptionEntry) {
 		String ext = "";
-		var picture = ((DataDescriptionEntryGroup)dataDescriptionEntry).getPictureClause();
+		PictureClause picture = ((DataDescriptionEntryGroup)dataDescriptionEntry).getPictureClause();
 		if(picture != null) {
 			String[] tokens = (String[]) picture.getCtx().children.stream()
 					.map( p -> p.getText())
@@ -174,7 +181,15 @@ public class DataDivisionHandler extends DivisionHandler {
 			ext = String.join(" ", tokens);
 		}
 		
-		return new ItemUnit(dataDescriptionEntry.getName(), ext);
+		ItemUnit itemUnit = new ItemUnit(dataDescriptionEntry.getName(), ext);
+		
+		ValueClause valueClause = ((DataDescriptionEntryGroup)dataDescriptionEntry).getValueClause();
+		if(valueClause != null) {
+			String value = valueClause.getValueIntervals().get(0).getCtx().getText();
+			itemUnit.setValueElement(new ValueElement(value));
+		}
+		
+		return itemUnit;
 	}
 	
 	private StorableUnit createStorableUnit(DataDescriptionEntry dataDescriptionEntry) {

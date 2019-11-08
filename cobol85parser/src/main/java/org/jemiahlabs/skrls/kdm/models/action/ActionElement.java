@@ -21,7 +21,7 @@ public class ActionElement extends CodeElement {
 	private List<CallableUnit> callableUnits;
 	
 	public ActionElement(String name) {
-		super(name);
+		setName(name);
 		codeElements = new ArrayList<CodeElement>();
 	}
 	

@@ -12,13 +12,8 @@ public class ValueElement extends XmiEntity {
 	@XStreamAsAttribute
 	private PrimitiveTypes primitiveType;
 	
-	public ValueElement(PrimitiveTypes primitiveType) {
-		this.primitiveType = primitiveType;
-	}
-	
-	public ValueElement(String value, PrimitiveTypes primitiveType) {
+	public ValueElement(String value) {
 		this.value = value;
-		this.primitiveType = primitiveType;
 	}
 	
 	public String getValue() {
