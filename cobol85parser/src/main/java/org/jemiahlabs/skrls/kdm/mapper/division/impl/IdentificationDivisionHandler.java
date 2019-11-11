@@ -44,7 +44,8 @@ public class IdentificationDivisionHandler extends DivisionHandler {
 			comments.addCommentUnit(new CommentUnit(identificationDivision.getRemarksParagraph().getRemarks()));
 			
 			CodeElement codeElement = new CodeElement();
-			codeElement.setType("code:LanguageUnit");
+			codeElement.setType("code:CompilationUnit");
+			codeElement.setName(identificationDivision.getProgramIdParagraph().getName());
 			codeElement.setComments(comments);
 			
 			codeModel.addCodeElement(codeElement);

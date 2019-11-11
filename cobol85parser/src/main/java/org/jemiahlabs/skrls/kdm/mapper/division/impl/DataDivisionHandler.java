@@ -64,14 +64,13 @@ public class DataDivisionHandler extends DivisionHandler {
 				dataModel.addDataElement(section);
 		});
 		
-		if(dataModel.getDataElements().size() > 0) dataModel.setLabel("Data Division");
-		
 		return dataModel;
 	}
 	
 	private DataElement processFileSection(FileSection fileSection) {
 		try {
-			DataElement dataElement = new DataElement("File Section");
+			DataElement dataElement = new DataElement();
+			dataElement.setType("data:DataAction");
 			List<FileDescriptionEntry> entries = fileSection.getFileDescriptionEntries();
 			
 			entries.forEach((fileEntry) -> {
@@ -98,7 +97,8 @@ public class DataDivisionHandler extends DivisionHandler {
 	
 	private DataElement processWorkingStorageSection(WorkingStorageSection workingStorageSection) {
 		try {
-			DataElement dataElement = new DataElement("Working Storage Section");
+			DataElement dataElement = new DataElement();
+			dataElement.setType("data:DataAction");
 			List<DataDescriptionEntry> entries = workingStorageSection
 					.getDataDescriptionEntries()
 					.get(0)
@@ -121,7 +121,8 @@ public class DataDivisionHandler extends DivisionHandler {
 	
 	private DataElement processLinkageSection(LinkageSection linkageSection) {
 		try {
-			DataElement dataElement = new DataElement("Linkage Section");
+			DataElement dataElement = new DataElement();
+			dataElement.setType("data:DataAction");
 			List<DataDescriptionEntry> entries = linkageSection
 					.getDataDescriptionEntries();
 			
