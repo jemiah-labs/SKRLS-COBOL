@@ -20,6 +20,10 @@ public class DataElement extends XmiEntity {
 	@XStreamImplicit
 	private List<ItemUnit> itemUnits;
 	
+	public DataElement() {
+		this(null);
+	}
+	
 	public DataElement(String name) {
 		this.name = name;
 		dataElements = new ArrayList<DataElement>();

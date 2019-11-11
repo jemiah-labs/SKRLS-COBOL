@@ -10,8 +10,8 @@ public class Source {
 	@XStreamAsAttribute
 	public String snippet;
 	
-	public Source(String snippet) {
-		this.snippet = snippet;
+	public Source(String language) {
+		this.language = language;
 	}
 
 	public String getLanguage() {

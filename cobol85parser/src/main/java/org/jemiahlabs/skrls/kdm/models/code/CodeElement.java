@@ -10,9 +10,8 @@ import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 public class CodeElement extends XmiEntity {
 	@XStreamAsAttribute
 	private String name;
-	@XStreamAsAttribute
-	private Source source;
 	
+	private Source source;
 	private Comments comments;
 	
 	public CodeElement() {
