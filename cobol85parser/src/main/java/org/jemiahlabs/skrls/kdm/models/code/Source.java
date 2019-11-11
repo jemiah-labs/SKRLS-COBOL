@@ -6,9 +6,9 @@ import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 @XStreamAlias("source") 
 public class Source {
 	@XStreamAsAttribute
-	public String language;
+	private String language;
 	@XStreamAsAttribute
-	public String snippet;
+	private String snippet;
 	
 	public Source(String language) {
 		this.language = language;

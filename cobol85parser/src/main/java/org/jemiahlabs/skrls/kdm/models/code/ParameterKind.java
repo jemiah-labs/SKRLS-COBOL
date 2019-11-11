@@ -1,10 +1,14 @@
 package org.jemiahlabs.skrls.kdm.models.code;
 
 public enum ParameterKind {
-	PUBLIC("public"),
-	PRIVATE("private"),
-	PROTECTED("protected"),
-	FINAL("final"),
+	BYVALUE("byValue"),
+	BYNAME("byName"),
+	BYREFERENCE("byReference"),
+	VARIADIC("variadic"),
+	RETURN("return"),
+	THROWS("throws"),
+	EXCEPTION("exception"),
+	CATCHALL("catchall"),
 	UNKNOWN("unknown");
 	
 	private String description;

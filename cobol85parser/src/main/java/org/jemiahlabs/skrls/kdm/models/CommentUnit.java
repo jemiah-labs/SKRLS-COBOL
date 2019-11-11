@@ -6,7 +6,7 @@ import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 @XStreamAlias("commentUnit")
 public class CommentUnit {
 	@XStreamAsAttribute
-	public String text;
+	private String text;
 	
 	public CommentUnit(String text) {
 		this.text = text;

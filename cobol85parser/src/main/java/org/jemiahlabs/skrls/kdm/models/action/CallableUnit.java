@@ -13,14 +13,12 @@ import com.thoughtworks.xstream.annotations.XStreamImplicit;
 @XStreamAlias("codeElement")
 public class CallableUnit extends CodeElement {
 	@XStreamAsAttribute
-	private String name;
-	@XStreamAsAttribute
 	private CallableKind kind;
 	@XStreamImplicit
 	List<ParameterUnit> parameters;
 	
-	public CallableUnit(String name) {
-		this.name = name;
+	public CallableUnit() {
+		setType("action:CallableUnit");
 		parameters = new ArrayList<ParameterUnit>();
 	}
 	
@@ -38,13 +36,5 @@ public class CallableUnit extends CodeElement {
 
 	public void setKind(CallableKind kind) {
 		this.kind = kind;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
 	}
 }
