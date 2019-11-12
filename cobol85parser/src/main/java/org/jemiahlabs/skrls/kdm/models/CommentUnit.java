@@ -4,7 +4,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
 @XStreamAlias("commentUnit")
-public class CommentUnit {
+public class CommentUnit extends XmiEntity {
 	@XStreamAsAttribute
 	private String text;
 	

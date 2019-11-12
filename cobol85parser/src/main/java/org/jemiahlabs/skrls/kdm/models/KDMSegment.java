@@ -9,9 +9,10 @@ import org.jemiahlabs.skrls.kdm.models.code.DataModel;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
+import com.thoughtworks.xstream.converters.reflection.NativeFieldKeySorter;
 
 @XStreamAlias("kdm:Segment")
-public class KDMSegment {
+public class KDMSegment extends NativeFieldKeySorter {
 	@XStreamAsAttribute 
     @XStreamAlias("xmi:version")
 	private final String version = "2.1";

@@ -23,6 +23,7 @@ import org.jemiahlabs.skrls.kdm.mapper.division.impl.EnviromentDivisionHandler;
 import org.jemiahlabs.skrls.kdm.mapper.division.impl.IdentificationDivisionHandler;
 import org.jemiahlabs.skrls.kdm.mapper.division.impl.ProcedureDivisionHandler;
 import org.jemiahlabs.skrls.kdm.models.KDMSegment;
+import org.jemiahlabs.skrls.kdm.models.util.Counter;
 import org.jemiahlabs.skrls.kdm.models.util.ListFilesUtil;
 import org.xml.sax.InputSource;
 
@@ -57,6 +58,7 @@ public class ExtractableKnowledgeImpl implements ExtractableKnowledge {
 				compilationUnits.forEach((compilationUnit) -> {
 					KDMSegment model = kdmMapper.process(compilationUnit);
 					exportXML(producer, model, outputDirFile);
+					Counter.getCounterGlobal().reset();
 				});
 				
 			} catch (IOException e) {
@@ -68,15 +70,16 @@ public class ExtractableKnowledgeImpl implements ExtractableKnowledge {
 	}
 	
 	private void configMapper(CobolKdmMapper kdmMapper) {
-		kdmMapper.addHandlerDefinition(IdentificationDivisionHandler.class);
 		kdmMapper.addHandlerDefinition(DataDivisionHandler.class);
 		kdmMapper.addHandlerDefinition(EnviromentDivisionHandler.class);
 		kdmMapper.addHandlerDefinition(ProcedureDivisionHandler.class);
+		kdmMapper.addHandlerDefinition(IdentificationDivisionHandler.class);
 	}
 	
 	private void exportXML(Producer producer, KDMSegment model, File outputDirFile) {
 		XStream xstream = new XStream(new StaxDriver());
 		xstream.autodetectAnnotations(true);
+		//xstream.
 		
 		String xml = xstream.toXML(model);
 		String xmlFormated = formatXML(xml);
@@ -94,7 +97,7 @@ public class ExtractableKnowledgeImpl implements ExtractableKnowledge {
 
 			serializer.setOutputProperty(OutputKeys.INDENT, "yes");
 			serializer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
-
+			
 			Source xmlSource = new SAXSource(new InputSource(
 					new ByteArrayInputStream(xml.getBytes())));
 			StreamResult res = new StreamResult(new ByteArrayOutputStream());            

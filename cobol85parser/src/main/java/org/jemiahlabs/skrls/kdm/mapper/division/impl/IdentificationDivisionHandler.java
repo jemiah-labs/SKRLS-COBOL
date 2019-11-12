@@ -7,6 +7,7 @@ import org.jemiahlabs.skrls.kdm.models.Comments;
 import org.jemiahlabs.skrls.kdm.models.KDMSegment;
 import org.jemiahlabs.skrls.kdm.models.code.CodeElement;
 import org.jemiahlabs.skrls.kdm.models.code.CodeModel;
+import org.jemiahlabs.skrls.kdm.models.util.Counter;
 
 import io.proleap.cobol.asg.metamodel.CompilationUnit;
 import io.proleap.cobol.asg.metamodel.identification.IdentificationDivision;
@@ -37,18 +38,25 @@ public class IdentificationDivisionHandler extends DivisionHandler {
 	private CodeModel createCodeModel(IdentificationDivision identificationDivision) {
 		try {
 			CodeModel codeModel = new CodeModel();
+			codeModel.setId(String.format("id.%s", Counter.getCounterGlobal().increment()));
 			codeModel.setType("code:CodeModel");
 			
-			Comments comments = new Comments();
-			comments.setAuthor(identificationDivision.getAuthorParagraph().getAuthor());
-			comments.addCommentUnit(new CommentUnit(identificationDivision.getRemarksParagraph().getRemarks()));
-			
 			CodeElement codeElement = new CodeElement();
+			codeElement.setId(String.format("id.%s", Counter.getCounterGlobal().increment()));
 			codeElement.setType("code:CompilationUnit");
 			codeElement.setName(identificationDivision.getProgramIdParagraph().getName());
-			codeElement.setComments(comments);
 			
+			Comments comments = new Comments();
+			comments.setId(String.format("id.%s", Counter.getCounterGlobal().increment()));
+			comments.setAuthor(identificationDivision.getAuthorParagraph().getAuthor());
+			
+			CommentUnit commentUnit = new CommentUnit(identificationDivision.getRemarksParagraph().getRemarks());
+			commentUnit.setId(String.format("id.%s", Counter.getCounterGlobal().increment()));
+			comments.addCommentUnit(commentUnit);
+			
+			codeElement.setComments(comments);
 			codeModel.addCodeElement(codeElement);
+			
 			return codeModel;
 		} catch(NullPointerException ex) {
 			getProducerMessage().emitInfoMessage("Incomplete IdentificationDivision");

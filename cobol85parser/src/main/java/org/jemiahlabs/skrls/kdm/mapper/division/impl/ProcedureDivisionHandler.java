@@ -56,9 +56,11 @@ public class ProcedureDivisionHandler extends DivisionHandler {
 	
 	private CodeModel createCodeModel(ProcedureDivision procedureDivision) {
 		CodeModel codeModel = new CodeModel();
+		codeModel.setId(String.format("id.%s", Counter.getCounterGlobal().increment()));
 		codeModel.setType("code:CodeModel");
 		
 		ActionElement rootActionElement = new ActionElement();
+		rootActionElement.setId(String.format("id.%s", Counter.getCounterGlobal().increment()));
 		rootActionElement.setType("code:CodeAssembly");
 		codeModel.addCodeElement(rootActionElement);
 		
@@ -74,6 +76,7 @@ public class ProcedureDivisionHandler extends DivisionHandler {
 	
 	private ActionElement processSection(Section section) {
 		ActionElement actionElement = new ActionElement();
+		actionElement.setId(String.format("id.%s", Counter.getCounterGlobal().increment()));
 		actionElement.setName(section.getName());
 		actionElement.setType("action:BlockUnit");
 		
@@ -87,6 +90,7 @@ public class ProcedureDivisionHandler extends DivisionHandler {
 	
 	private ActionElement processParagraph(Paragraph paragraph) {
 		ActionElement actionElement = new ActionElement();
+		actionElement.setId(String.format("id.%s", Counter.getCounterGlobal().increment()));
 		actionElement.setName(paragraph.getName());
 		actionElement.setType("action:BlockUnit");
 		
@@ -114,10 +118,12 @@ public class ProcedureDivisionHandler extends DivisionHandler {
 	
 	private CodeElement createControlFlowElement(IfStatement statement) {
 		ActionElement rootActionElement = new ActionElement();
+		rootActionElement.setId(String.format("id.%s", Counter.getCounterGlobal().increment()));
 		rootActionElement.setType("action:ControlFlow");
 		
 		ConditionValueStmt conditionStatement = statement.getCondition();
 		Source source = new Source("Cobol");
+		source.setId(String.format("id.%s", Counter.getCounterGlobal().increment()));
 		source.setSnippet(getStringStatement(conditionStatement.getCtx().children));
 		rootActionElement.setSource(source);
 		
@@ -129,6 +135,7 @@ public class ProcedureDivisionHandler extends DivisionHandler {
 	
 	private void createFlowTrueElement(IfStatement statement, ActionElement rootActionElement) {
 		final ActionElement flowTrue = new ActionElement();
+		flowTrue.setId(String.format("id.%s", Counter.getCounterGlobal().increment()));
 		flowTrue.setType("action:TrueFlow");
 		
 		statement.getThen().getStatements().forEach(s -> {
@@ -144,6 +151,7 @@ public class ProcedureDivisionHandler extends DivisionHandler {
 		
 		if(elseStatements != null) {
 			final ActionElement flowFalse = new ActionElement();
+			flowFalse.setId(String.format("id.%s", Counter.getCounterGlobal().increment()));
 			flowFalse.setType("action:FalseFlow");
 			
 			elseStatements.getStatements().forEach(s -> {
@@ -157,6 +165,7 @@ public class ProcedureDivisionHandler extends DivisionHandler {
 	
 	private CodeElement createIterableFlowElement(PerformStatement statement) {
 		ActionElement rootActionElement = new ActionElement();
+		rootActionElement.setId(String.format("id.%s", Counter.getCounterGlobal().increment()));
 		rootActionElement.setType("action:ControlFlow");
 		
 		if(statement.getPerformStatementType() == PerformStatementType.PROCEDURE) {
@@ -171,6 +180,7 @@ public class ProcedureDivisionHandler extends DivisionHandler {
 	private void createProcedureFlowElement(PerformStatement statement, ActionElement rootActionElement) {
 		String snippet =  getStringStatement(statement.getCtx().children);
 		Source source = new Source("Cobol");
+		source.setId(String.format("id.%s", Counter.getCounterGlobal().increment()));
 		source.setSnippet(snippet);
 		
 		rootActionElement.setSource(source);
@@ -184,11 +194,13 @@ public class ProcedureDivisionHandler extends DivisionHandler {
 		PerformInlineStatement performInlineStatement = statement.getPerformInlineStatement();
 		getStringStatement(performInlineStatement.getCtx().getChild(0), snippet);
 		Source source = new Source("Cobol");
+		source.setId(String.format("id.%s", Counter.getCounterGlobal().increment()));
 		source.setSnippet(snippet.toString().trim());
 		
 		rootActionElement.setSource(source);
 		
 		final ActionElement entryFlow = new ActionElement();
+		entryFlow.setId(String.format("id.%s", Counter.getCounterGlobal().increment()));
 		entryFlow.setType("action:EntryFlow");
 		
 		statement.getPerformInlineStatement().getStatements().forEach(s -> {
@@ -201,11 +213,12 @@ public class ProcedureDivisionHandler extends DivisionHandler {
 	
 	private CodeElement createSubroutineElement(CallStatement statement) {
 		CallableUnit callableUnit = new CallableUnit();
-		
+		callableUnit.setId(String.format("id.%s", Counter.getCounterGlobal().increment()));
 		callableUnit.setKind(CallableKind.EXTERNAL);
 		callableUnit.setName(statement.getProgramValueStmt().getCtx().getText());
 		
 		Source source = new Source("Cobol");
+		source.setId(String.format("id.%s", Counter.getCounterGlobal().increment()));
 		source.setSnippet(getStringStatement(statement.getCtx().children));
 		callableUnit.setSource(source);
 		
@@ -232,15 +245,18 @@ public class ProcedureDivisionHandler extends DivisionHandler {
 	
 	private ParameterUnit createParameterElement(String name, ParameterKind kind, int position) {
 		ParameterUnit parameterUnit = new ParameterUnit(name, position);
+		parameterUnit.setId(String.format("id.%s", Counter.getCounterGlobal().increment()));
 		parameterUnit.setKind(kind);
 		return parameterUnit;
 	}
 	
 	private CodeElement createGenericElement(Statement statement) {
 		ActionElement rootActionElement = new ActionElement();
+		rootActionElement.setId(String.format("id.%s", Counter.getCounterGlobal().increment()));
 		rootActionElement.setType("action:ActionElement");
 		
 		Source source = new Source("Cobol");
+		source.setId(String.format("id.%s", Counter.getCounterGlobal().increment()));
 		source.setSnippet(getStringStatement(statement.getCtx().children));
 		rootActionElement.setSource(source);
 		

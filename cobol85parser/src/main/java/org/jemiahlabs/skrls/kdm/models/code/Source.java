@@ -1,10 +1,12 @@
 package org.jemiahlabs.skrls.kdm.models.code;
 
+import org.jemiahlabs.skrls.kdm.models.XmiEntity;
+
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
 @XStreamAlias("source") 
-public class Source {
+public class Source extends XmiEntity {
 	@XStreamAsAttribute
 	private String language;
 	@XStreamAsAttribute

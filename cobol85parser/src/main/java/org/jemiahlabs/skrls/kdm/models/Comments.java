@@ -6,7 +6,7 @@ import java.util.List;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
 
-public class Comments {
+public class Comments extends XmiEntity {
 	@XStreamAsAttribute
 	private String Author;
 	@XStreamImplicit

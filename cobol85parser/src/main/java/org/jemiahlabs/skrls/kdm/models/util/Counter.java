@@ -20,6 +20,14 @@ public class Counter {
 		count = initialCount;
 	}
 	
+	public void reset(int initialCount) {
+		count = initialCount;
+	}
+	
+	public void reset() {
+		reset(0);
+	}
+	
 	public int increment() {
 		return count++;
 	}

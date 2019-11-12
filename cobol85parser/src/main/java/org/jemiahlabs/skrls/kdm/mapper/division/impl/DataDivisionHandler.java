@@ -12,6 +12,7 @@ import org.jemiahlabs.skrls.kdm.models.code.ItemUnit;
 import org.jemiahlabs.skrls.kdm.models.code.StorableKind;
 import org.jemiahlabs.skrls.kdm.models.code.StorableUnit;
 import org.jemiahlabs.skrls.kdm.models.code.ValueElement;
+import org.jemiahlabs.skrls.kdm.models.util.Counter;
 import org.jemiahlabs.skrls.kdm.models.util.LinkedIterator;
 
 import io.proleap.cobol.asg.metamodel.CompilationUnit;
@@ -53,6 +54,7 @@ public class DataDivisionHandler extends DivisionHandler {
 	
 	private DataModel createDataModel(DataDivision dataDivision) {
 		DataModel dataModel = new DataModel();
+		dataModel.setId(String.format("id.%s", Counter.getCounterGlobal().increment()));
 		
 		List<DataElement> sections = new ArrayList<DataElement>();
 		sections.add(processFileSection(dataDivision.getFileSection()));
@@ -70,11 +72,13 @@ public class DataDivisionHandler extends DivisionHandler {
 	private DataElement processFileSection(FileSection fileSection) {
 		try {
 			DataElement dataElement = new DataElement();
+			dataElement.setId(String.format("id.%s", Counter.getCounterGlobal().increment()));
 			dataElement.setType("data:DataAction");
 			List<FileDescriptionEntry> entries = fileSection.getFileDescriptionEntries();
 			
 			entries.forEach((fileEntry) -> {
 				DataElement dataElementInner = new DataElement(fileEntry.getName());
+				dataElementInner.setId(String.format("id.%s", Counter.getCounterGlobal().increment()));
 				dataElementInner.setType("data:RecordFile");
 				dataElement.addDataElement(dataElementInner);
 				List<DataDescriptionEntry> entriesInner  = fileEntry.getDataDescriptionEntries();
@@ -98,6 +102,7 @@ public class DataDivisionHandler extends DivisionHandler {
 	private DataElement processWorkingStorageSection(WorkingStorageSection workingStorageSection) {
 		try {
 			DataElement dataElement = new DataElement();
+			dataElement.setId(String.format("id.%s", Counter.getCounterGlobal().increment()));
 			dataElement.setType("data:DataAction");
 			List<DataDescriptionEntry> entries = workingStorageSection
 					.getDataDescriptionEntries()
@@ -122,6 +127,7 @@ public class DataDivisionHandler extends DivisionHandler {
 	private DataElement processLinkageSection(LinkageSection linkageSection) {
 		try {
 			DataElement dataElement = new DataElement();
+			dataElement.setId(String.format("id.%s", Counter.getCounterGlobal().increment()));
 			dataElement.setType("data:DataAction");
 			List<DataDescriptionEntry> entries = linkageSection
 					.getDataDescriptionEntries();
@@ -183,11 +189,15 @@ public class DataDivisionHandler extends DivisionHandler {
 		}
 		
 		ItemUnit itemUnit = new ItemUnit(dataDescriptionEntry.getName(), ext);
+		itemUnit.setId(String.format("id.%s", Counter.getCounterGlobal().increment()));
 		
 		ValueClause valueClause = ((DataDescriptionEntryGroup)dataDescriptionEntry).getValueClause();
 		if(valueClause != null) {
 			String value = valueClause.getValueIntervals().get(0).getCtx().getText();
-			itemUnit.setValueElement(new ValueElement(value));
+			ValueElement valueElement = new ValueElement(value);
+			valueElement.setId(String.format("id.%s", Counter.getCounterGlobal().increment()));
+			
+			itemUnit.setValueElement(valueElement);
 		}
 		
 		return itemUnit;
@@ -195,6 +205,7 @@ public class DataDivisionHandler extends DivisionHandler {
 	
 	private StorableUnit createStorableUnit(DataDescriptionEntry dataDescriptionEntry) {
 		StorableUnit storableUnit = new StorableUnit(dataDescriptionEntry.getName());
+		storableUnit.setId(String.format("id.%s", Counter.getCounterGlobal().increment()));
 		storableUnit.setKind(kindCurrent);
 		
 		return storableUnit;
