@@ -24,34 +24,34 @@ public class IdentificationDivisionHandler extends DivisionHandler {
 
 	@Override
 	public void process(CompilationUnit compilationUnit, KDMSegment model) {
-		getProducerMessage().emitInfoMessage("Identification Division Extracting");
+		getMessageProducer().emitInfoMessage("Identification Division Extracting");
 		model.setName(compilationUnit.getName());
 		
 		CodeModel codeModel = createCodeModel(compilationUnit.getProgramUnit().getIdentificationDivision());
 		
 		if(codeModel != null) model.addCodeModel(codeModel);
 		
-		if(isNextHandler())
+		if(hasNextHandler())
 			getNextHandler().process(compilationUnit, model);
 	}
 	
 	private CodeModel createCodeModel(IdentificationDivision identificationDivision) {
 		try {
 			CodeModel codeModel = new CodeModel();
-			codeModel.setId(String.format("id.%s", Counter.getCounterGlobal().increment()));
+			codeModel.setId(String.format("id.%s", Counter.getGlobalCounter().increment()));
 			codeModel.setType("code:CodeModel");
 			
 			CodeElement codeElement = new CodeElement();
-			codeElement.setId(String.format("id.%s", Counter.getCounterGlobal().increment()));
+			codeElement.setId(String.format("id.%s", Counter.getGlobalCounter().increment()));
 			codeElement.setType("code:CompilationUnit");
 			codeElement.setName(identificationDivision.getProgramIdParagraph().getName());
 			
 			Comments comments = new Comments();
-			comments.setId(String.format("id.%s", Counter.getCounterGlobal().increment()));
+			comments.setId(String.format("id.%s", Counter.getGlobalCounter().increment()));
 			comments.setAuthor(identificationDivision.getAuthorParagraph().getAuthor());
 			
 			CommentUnit commentUnit = new CommentUnit(identificationDivision.getRemarksParagraph().getRemarks());
-			commentUnit.setId(String.format("id.%s", Counter.getCounterGlobal().increment()));
+			commentUnit.setId(String.format("id.%s", Counter.getGlobalCounter().increment()));
 			comments.addCommentUnit(commentUnit);
 			
 			codeElement.setComments(comments);
@@ -59,9 +59,9 @@ public class IdentificationDivisionHandler extends DivisionHandler {
 			
 			return codeModel;
 		} catch(NullPointerException ex) {
-			getProducerMessage().emitInfoMessage("Incomplete IdentificationDivision");
+			getMessageProducer().emitInfoMessage("Incomplete IdentificationDivision");
 		} catch (Exception ex) {
-			getProducerMessage().emitInfoMessage(ex.getMessage());
+			getMessageProducer().emitInfoMessage(ex.getMessage());
 		}
 		
 		return null;

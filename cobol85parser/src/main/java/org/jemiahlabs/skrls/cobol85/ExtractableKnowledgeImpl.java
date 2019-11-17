@@ -15,11 +15,14 @@ import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.sax.SAXTransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 
+import org.jemiahlabs.skrls.core.Channel;
 import org.jemiahlabs.skrls.core.ExtractableKnowledge;
+import org.jemiahlabs.skrls.core.Message;
 import org.jemiahlabs.skrls.core.Producer;
+import org.jemiahlabs.skrls.core.TypeMessage;
 import org.jemiahlabs.skrls.kdm.mapper.CobolKdmMapper;
 import org.jemiahlabs.skrls.kdm.mapper.division.impl.DataDivisionHandler;
-import org.jemiahlabs.skrls.kdm.mapper.division.impl.EnviromentDivisionHandler;
+import org.jemiahlabs.skrls.kdm.mapper.division.impl.EnvironmentDivisionHandler;
 import org.jemiahlabs.skrls.kdm.mapper.division.impl.IdentificationDivisionHandler;
 import org.jemiahlabs.skrls.kdm.mapper.division.impl.ProcedureDivisionHandler;
 import org.jemiahlabs.skrls.kdm.models.KDMSegment;
@@ -40,7 +43,7 @@ public class ExtractableKnowledgeImpl implements ExtractableKnowledge {
 	@Override
 	public void extractKDM(Producer producer, String source, String outputDir) {
 		File outputDirFile = new File(outputDir);
-		if(!outputDirFile.exists() && !outputDirFile.isDirectory()) {
+		if(!outputDirFile.exists() || !outputDirFile.isDirectory()) {
 			producer.emitErrorMessage("Output directory not found");
 			return;
 		}
@@ -58,7 +61,7 @@ public class ExtractableKnowledgeImpl implements ExtractableKnowledge {
 				compilationUnits.forEach((compilationUnit) -> {
 					KDMSegment model = kdmMapper.process(compilationUnit);
 					exportXML(producer, model, outputDirFile);
-					Counter.getCounterGlobal().reset();
+					Counter.getGlobalCounter().reset();
 				});
 				
 			} catch (IOException e) {
@@ -71,7 +74,7 @@ public class ExtractableKnowledgeImpl implements ExtractableKnowledge {
 	
 	private void configMapper(CobolKdmMapper kdmMapper) {
 		kdmMapper.addHandlerDefinition(DataDivisionHandler.class);
-		kdmMapper.addHandlerDefinition(EnviromentDivisionHandler.class);
+		kdmMapper.addHandlerDefinition(EnvironmentDivisionHandler.class);
 		kdmMapper.addHandlerDefinition(ProcedureDivisionHandler.class);
 		kdmMapper.addHandlerDefinition(IdentificationDivisionHandler.class);
 	}
@@ -79,12 +82,10 @@ public class ExtractableKnowledgeImpl implements ExtractableKnowledge {
 	private void exportXML(Producer producer, KDMSegment model, File outputDirFile) {
 		XStream xstream = new XStream(new StaxDriver());
 		xstream.autodetectAnnotations(true);
-		//xstream.
-		
 		String xml = xstream.toXML(model);
-		String xmlFormated = formatXML(xml);
+		String formatedXML = formatXML(xml);
 		try {
-			saveFile(xmlFormated, Paths.get(outputDirFile.getAbsolutePath(), model.getName() + ".xml").toFile());
+			saveFile(formatedXML, Paths.get(outputDirFile.getAbsolutePath(), model.getName() + ".xml").toFile());
 			producer.emitInfoMessage("Generated file " + model.getName());
 		} catch (IOException e) {
 			producer.emitErrorMessage("Error in XML Write: " + e.getMessage());

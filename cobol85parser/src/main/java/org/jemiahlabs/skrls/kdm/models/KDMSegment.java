@@ -10,6 +10,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
 import com.thoughtworks.xstream.converters.reflection.NativeFieldKeySorter;
+import org.jemiahlabs.skrls.kdm.models.platform.PlatformModel;
 
 @XStreamAlias("kdm:Segment")
 public class KDMSegment extends NativeFieldKeySorter {
@@ -36,12 +37,16 @@ public class KDMSegment extends NativeFieldKeySorter {
 	private final String platform = "http://kdm.omg.org/platform";
 	@XStreamAsAttribute 
 	private String name;
-	
+
 	@XStreamAlias("model")
 	private DataModel dataModel;
+
+	@XStreamAlias("model")
+	private PlatformModel platformModel;
+
 	@XStreamImplicit
 	private List<CodeModel> codeModels;
-	
+
 	public KDMSegment() {
 		codeModels = new ArrayList<CodeModel>();
 	}
@@ -70,4 +75,11 @@ public class KDMSegment extends NativeFieldKeySorter {
 		return codeModels;
 	}
 
+	public PlatformModel getPlatformModel() {
+		return platformModel;
+	}
+
+	public void setPlatformModel(PlatformModel platformModel) {
+		this.platformModel = platformModel;
+	}
 }

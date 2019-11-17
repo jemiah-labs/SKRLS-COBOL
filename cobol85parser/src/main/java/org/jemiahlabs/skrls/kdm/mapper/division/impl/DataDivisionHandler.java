@@ -39,86 +39,73 @@ public class DataDivisionHandler extends DivisionHandler {
 
 	@Override
 	public void process(CompilationUnit compilationUnit, KDMSegment model) {
-		getProducerMessage().emitInfoMessage("Data Division Extracting.");
-		
+		getMessageProducer().emitInfoMessage("Data Division Extracting.");
 		DataDivision dataDivision = compilationUnit.getProgramUnit().getDataDivision();
-		
 		if(dataDivision != null) {
 			DataModel dataModel = createDataModel(dataDivision);
 			model.setDataModel(dataModel);
 		}
-		
-		if(isNextHandler())
+		if(hasNextHandler())
 			getNextHandler().process(compilationUnit, model);
 	}
 	
 	private DataModel createDataModel(DataDivision dataDivision) {
 		DataModel dataModel = new DataModel();
-		dataModel.setId(String.format("id.%s", Counter.getCounterGlobal().increment()));
-		
-		List<DataElement> sections = new ArrayList<DataElement>();
+		dataModel.setId(String.format("id.%s", Counter.getGlobalCounter().increment()));
+		List<DataElement> sections = new ArrayList<>();
 		sections.add(processFileSection(dataDivision.getFileSection()));
 		sections.add(processWorkingStorageSection(dataDivision.getWorkingStorageSection()));
 		sections.add(processLinkageSection(dataDivision.getLinkageSection()));
-		
 		sections.forEach(section -> {
 			if(section != null)
 				dataModel.addDataElement(section);
 		});
-		
 		return dataModel;
 	}
 	
 	private DataElement processFileSection(FileSection fileSection) {
 		try {
-			DataElement dataElement = new DataElement();
-			dataElement.setId(String.format("id.%s", Counter.getCounterGlobal().increment()));
-			dataElement.setType("data:DataAction");
 			List<FileDescriptionEntry> entries = fileSection.getFileDescriptionEntries();
-			
+			DataElement dataElement = new DataElement();
+			dataElement.setId(String.format("id.%s", Counter.getGlobalCounter().increment()));
+			dataElement.setType("data:DataAction");
 			entries.forEach((fileEntry) -> {
 				DataElement dataElementInner = new DataElement(fileEntry.getName());
-				dataElementInner.setId(String.format("id.%s", Counter.getCounterGlobal().increment()));
+				dataElementInner.setId(String.format("id.%s", Counter.getGlobalCounter().increment()));
 				dataElementInner.setType("data:RecordFile");
 				dataElement.addDataElement(dataElementInner);
 				List<DataDescriptionEntry> entriesInner  = fileEntry.getDataDescriptionEntries();
-				
-				LinkedIterator<DataDescriptionEntry> sequence = new LinkedIterator<DataDescriptionEntry>(entriesInner);
+				LinkedIterator<DataDescriptionEntry> sequence = new LinkedIterator<>(entriesInner);
 				kindCurrent = StorableKind.REGISTER;
 				highLevelExtractData(sequence, sequence.hasNext() ? sequence.next() : null, dataElementInner);
 			});
-			
 			return dataElement;
-			
 		} catch(NullPointerException ex) {
-			getProducerMessage().emitInfoMessage("Not Found FileSection");
+			getMessageProducer().emitInfoMessage("Not Found FileSection");
 		} catch (Exception ex) {
-			getProducerMessage().emitInfoMessage(ex.getMessage());
+			getMessageProducer().emitInfoMessage(ex.getMessage());
 		}
-		
 		return null;
 	}
 	
 	private DataElement processWorkingStorageSection(WorkingStorageSection workingStorageSection) {
 		try {
-			DataElement dataElement = new DataElement();
-			dataElement.setId(String.format("id.%s", Counter.getCounterGlobal().increment()));
-			dataElement.setType("data:DataAction");
 			List<DataDescriptionEntry> entries = workingStorageSection
-					.getDataDescriptionEntries()
-					.get(0)
-					.getDataDescriptionEntryContainer()
-					.getDataDescriptionEntries();
-			
+				.getDataDescriptionEntries()
+				.get(0)
+				.getDataDescriptionEntryContainer()
+				.getDataDescriptionEntries();
+			DataElement dataElement = new DataElement();
+			dataElement.setId(String.format("id.%s", Counter.getGlobalCounter().increment()));
+			dataElement.setType("data:DataAction");
 			LinkedIterator<DataDescriptionEntry> sequence = new LinkedIterator<DataDescriptionEntry>(entries);
 			kindCurrent = StorableKind.LOCAL;
 			highLevelExtractData(sequence, sequence.hasNext() ? sequence.next() : null, dataElement);
 			return dataElement;
-			
 		} catch(NullPointerException ex) {
-			getProducerMessage().emitInfoMessage("Not Found WorkingStorageSection");
+			getMessageProducer().emitInfoMessage("Not Found WorkingStorageSection");
 		} catch (Exception ex) {
-			getProducerMessage().emitInfoMessage(ex.getMessage());
+			getMessageProducer().emitInfoMessage(ex.getMessage());
 		}
 		
 		return null;
@@ -126,23 +113,19 @@ public class DataDivisionHandler extends DivisionHandler {
 	
 	private DataElement processLinkageSection(LinkageSection linkageSection) {
 		try {
+			List<DataDescriptionEntry> entries = linkageSection.getDataDescriptionEntries();
 			DataElement dataElement = new DataElement();
-			dataElement.setId(String.format("id.%s", Counter.getCounterGlobal().increment()));
+			dataElement.setId(String.format("id.%s", Counter.getGlobalCounter().increment()));
 			dataElement.setType("data:DataAction");
-			List<DataDescriptionEntry> entries = linkageSection
-					.getDataDescriptionEntries();
-			
 			LinkedIterator<DataDescriptionEntry> current = new LinkedIterator<DataDescriptionEntry>(entries);
 			kindCurrent = StorableKind.EXTERNAL;
 			highLevelExtractData(current, current.hasNext() ? current.next() : null, dataElement);
 			return dataElement;
-			
 		} catch(NullPointerException ex) {
-			getProducerMessage().emitInfoMessage("Not Found LinkageSection");
+			getMessageProducer().emitInfoMessage("Not Found LinkageSection");
 		} catch (Exception ex) {
-			getProducerMessage().emitInfoMessage(ex.getMessage());
+			getMessageProducer().emitInfoMessage(ex.getMessage());
 		}
-		
 		return null;
 	}
 	
@@ -189,25 +172,21 @@ public class DataDivisionHandler extends DivisionHandler {
 		}
 		
 		ItemUnit itemUnit = new ItemUnit(dataDescriptionEntry.getName(), ext);
-		itemUnit.setId(String.format("id.%s", Counter.getCounterGlobal().increment()));
-		
+		itemUnit.setId(String.format("id.%s", Counter.getGlobalCounter().increment()));
 		ValueClause valueClause = ((DataDescriptionEntryGroup)dataDescriptionEntry).getValueClause();
 		if(valueClause != null) {
 			String value = valueClause.getValueIntervals().get(0).getCtx().getText();
 			ValueElement valueElement = new ValueElement(value);
-			valueElement.setId(String.format("id.%s", Counter.getCounterGlobal().increment()));
-			
+			valueElement.setId(String.format("id.%s", Counter.getGlobalCounter().increment()));
 			itemUnit.setValueElement(valueElement);
 		}
-		
 		return itemUnit;
 	}
 	
 	private StorableUnit createStorableUnit(DataDescriptionEntry dataDescriptionEntry) {
 		StorableUnit storableUnit = new StorableUnit(dataDescriptionEntry.getName());
-		storableUnit.setId(String.format("id.%s", Counter.getCounterGlobal().increment()));
+		storableUnit.setId(String.format("id.%s", Counter.getGlobalCounter().increment()));
 		storableUnit.setKind(kindCurrent);
-		
 		return storableUnit;
 	}
 }

@@ -15,15 +15,15 @@ public class ListFilesUtil {
 		listFiles(directoryName, file -> true);
     }
 	
-	public void listFiles(String directoryName, Predicate<File> fileValid) {
+	public void listFiles(String directoryName, Predicate<File> validFile) {
         File directory = new File(directoryName);
-        File[] fList = directory.listFiles();
+        File[] files = directory.listFiles();
 
-        for (File file : fList) {
-            if ( file.isFile() && fileValid.test(file)) {
+        for (File file : files) {
+            if ( file.isFile() && validFile.test(file)) {
                 listener.accept(file);
             } else if (file.isDirectory()){
-            	listFiles(file.getAbsolutePath(), fileValid);
+            	listFiles(file.getAbsolutePath(), validFile);
             }
         }
     }

@@ -31,16 +31,16 @@ public class CobolKdmMapper {
 	
 	public void addHandlerDefinition(Class<? extends DivisionHandler> handlerDefinition) {
 		if(handlerStart == null) {
-			handlerStart = resolvehandler(handlerDefinition);
+			handlerStart = resolveHandler(handlerDefinition);
 			handlerEnd = handlerStart;
 		} else {
-			DivisionHandler handlerCurrent = resolvehandler(handlerDefinition);
-			handlerEnd.setNextHandler(handlerCurrent);
-			handlerEnd = handlerCurrent;
+			DivisionHandler currentHandler = resolveHandler(handlerDefinition);
+			handlerEnd.setNextHandler(currentHandler);
+			handlerEnd = currentHandler;
 		}
 	}
 	
-	private DivisionHandler resolvehandler(Class<? extends DivisionHandler> handlerDefinition) {
+	private DivisionHandler resolveHandler(Class<? extends DivisionHandler> handlerDefinition) {
 		try {
 			return createHandlerDivision(handlerDefinition);
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
@@ -50,7 +50,7 @@ public class CobolKdmMapper {
 		}
 	}
 	
-	private DivisionHandler createHandlerDivision(Class<? extends DivisionHandler> handlerDefinition) throws InstantiationException, 
+	private DivisionHandler createHandlerDivision(Class<? extends DivisionHandler> handlerDefinition) throws InstantiationException,
 		IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
 		return handlerDefinition.getConstructor(Producer.class).newInstance(producer);
 	}
