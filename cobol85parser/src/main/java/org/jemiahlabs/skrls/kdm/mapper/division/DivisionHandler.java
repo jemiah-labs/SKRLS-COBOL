@@ -22,7 +22,7 @@ public abstract class DivisionHandler {
 		this.nextHandler = nextHandler;
 	}
 	
-	public boolean isNextHandler() {
+	public boolean hasNextHandler() {
 		return nextHandler != null;
 	}
 	
@@ -30,7 +30,7 @@ public abstract class DivisionHandler {
 		return nextHandler;
 	}
 	
-	public Producer getProducerMessage() {
+	public Producer getMessageProducer() {
 		return producer;
 	}
 	

@@ -1,11 +1,11 @@
 package org.jemiahlabs.skrls.kdm.models.util;
 
 public class Counter {
-	private static final Counter counterGlobal = new Counter(0);
+	private static final Counter globalCounter = new Counter(0);
 	private int count;
 	
-	public static Counter getCounterGlobal() {
-		return counterGlobal;
+	public static Counter getGlobalCounter() {
+		return globalCounter;
 	}
 	
 	public static Counter getLocalCounter() {
@@ -16,7 +16,7 @@ public class Counter {
 		return new Counter(initialCount);
 	}
 	
-	public Counter(int initialCount) {
+	private Counter(int initialCount) {
 		count = initialCount;
 	}
 	

@@ -41,6 +41,8 @@ public class KDMSegment extends NativeFieldKeySorter {
 	private DataModel dataModel;
 	@XStreamImplicit
 	private List<CodeModel> codeModels;
+
+	//TODO add platformModel to this class
 	
 	public KDMSegment() {
 		codeModels = new ArrayList<CodeModel>();

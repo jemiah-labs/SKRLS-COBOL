@@ -1,5 +1,6 @@
 package org.jemiahlabs.skrls.kdm.mapper.division.impl;
 
+import io.proleap.cobol.asg.metamodel.environment.EnvironmentDivision;
 import org.jemiahlabs.skrls.core.Producer;
 import org.jemiahlabs.skrls.kdm.mapper.division.DivisionHandler;
 import org.jemiahlabs.skrls.kdm.models.KDMSegment;
@@ -18,9 +19,13 @@ public class EnviromentDivisionHandler extends DivisionHandler {
 	
 	@Override
 	public void process(CompilationUnit compilationUnit, KDMSegment model) {
-		getProducerMessage().emitInfoMessage("Enviroment Division Extracting");
-		
-		if(isNextHandler())
+		getMessageProducer().emitInfoMessage("Extracting Environment Division");
+		EnvironmentDivision environmentDivision = compilationUnit.getProgramUnit().getEnvironmentDivision();
+		if(environmentDivision != null) {
+			PlatformModel dataModel = createDataModel(environmentDivision);
+			model.setDataModel(dataModel);
+		}
+		if(hasNextHandler())
 			getNextHandler().process(compilationUnit, model);
 	}
 

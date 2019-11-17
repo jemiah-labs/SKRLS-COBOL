@@ -40,7 +40,7 @@ public class ExtractableKnowledgeImpl implements ExtractableKnowledge {
 	@Override
 	public void extractKDM(Producer producer, String source, String outputDir) {
 		File outputDirFile = new File(outputDir);
-		if(!outputDirFile.exists() && !outputDirFile.isDirectory()) {
+		if(!outputDirFile.exists() || !outputDirFile.isDirectory()) {
 			producer.emitErrorMessage("Output directory not found");
 			return;
 		}
@@ -58,7 +58,7 @@ public class ExtractableKnowledgeImpl implements ExtractableKnowledge {
 				compilationUnits.forEach((compilationUnit) -> {
 					KDMSegment model = kdmMapper.process(compilationUnit);
 					exportXML(producer, model, outputDirFile);
-					Counter.getCounterGlobal().reset();
+					Counter.getGlobalCounter().reset();
 				});
 				
 			} catch (IOException e) {
@@ -79,12 +79,10 @@ public class ExtractableKnowledgeImpl implements ExtractableKnowledge {
 	private void exportXML(Producer producer, KDMSegment model, File outputDirFile) {
 		XStream xstream = new XStream(new StaxDriver());
 		xstream.autodetectAnnotations(true);
-		//xstream.
-		
 		String xml = xstream.toXML(model);
-		String xmlFormated = formatXML(xml);
+		String formatedXML = formatXML(xml);
 		try {
-			saveFile(xmlFormated, Paths.get(outputDirFile.getAbsolutePath(), model.getName() + ".xml").toFile());
+			saveFile(formatedXML, Paths.get(outputDirFile.getAbsolutePath(), model.getName() + ".xml").toFile());
 			producer.emitInfoMessage("Generated file " + model.getName());
 		} catch (IOException e) {
 			producer.emitErrorMessage("Error in XML Write: " + e.getMessage());
