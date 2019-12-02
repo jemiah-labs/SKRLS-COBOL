@@ -76,7 +76,7 @@ public class DataDivisionHandler extends DivisionHandler {
 				dataElementInner.setType("data:RecordFile");
 				dataElement.addDataElement(dataElementInner);
 				List<DataDescriptionEntry> entriesInner  = fileEntry.getDataDescriptionEntries();
-				LinkedIterator<DataDescriptionEntry> sequence = new LinkedIterator<DataDescriptionEntry>(entriesInner);
+				LinkedIterator<DataDescriptionEntry> sequence = new LinkedIterator<>(entriesInner);
 				kindCurrent = StorableKind.REGISTER;
 				highLevelExtractData(sequence, sequence.hasNext() ? sequence.next() : null, dataElementInner);
 			});

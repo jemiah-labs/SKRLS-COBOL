@@ -19,7 +19,7 @@ import org.jemiahlabs.skrls.core.ExtractableKnowledge;
 import org.jemiahlabs.skrls.core.Producer;
 import org.jemiahlabs.skrls.kdm.mapper.CobolKdmMapper;
 import org.jemiahlabs.skrls.kdm.mapper.division.impl.DataDivisionHandler;
-import org.jemiahlabs.skrls.kdm.mapper.division.impl.EnviromentDivisionHandler;
+import org.jemiahlabs.skrls.kdm.mapper.division.impl.EnvironmentDivisionHandler;
 import org.jemiahlabs.skrls.kdm.mapper.division.impl.IdentificationDivisionHandler;
 import org.jemiahlabs.skrls.kdm.mapper.division.impl.ProcedureDivisionHandler;
 import org.jemiahlabs.skrls.kdm.models.KDMSegment;
@@ -71,7 +71,7 @@ public class ExtractableKnowledgeImpl implements ExtractableKnowledge {
 	
 	private void configMapper(CobolKdmMapper kdmMapper) {
 		kdmMapper.addHandlerDefinition(DataDivisionHandler.class);
-		kdmMapper.addHandlerDefinition(EnviromentDivisionHandler.class);
+		kdmMapper.addHandlerDefinition(EnvironmentDivisionHandler.class);
 		kdmMapper.addHandlerDefinition(ProcedureDivisionHandler.class);
 		kdmMapper.addHandlerDefinition(IdentificationDivisionHandler.class);
 	}
