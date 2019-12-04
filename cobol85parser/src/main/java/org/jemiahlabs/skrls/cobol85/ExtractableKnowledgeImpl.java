@@ -15,8 +15,11 @@ import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.sax.SAXTransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 
+import org.jemiahlabs.skrls.core.Channel;
 import org.jemiahlabs.skrls.core.ExtractableKnowledge;
+import org.jemiahlabs.skrls.core.Message;
 import org.jemiahlabs.skrls.core.Producer;
+import org.jemiahlabs.skrls.core.TypeMessage;
 import org.jemiahlabs.skrls.kdm.mapper.CobolKdmMapper;
 import org.jemiahlabs.skrls.kdm.mapper.division.impl.DataDivisionHandler;
 import org.jemiahlabs.skrls.kdm.mapper.division.impl.EnvironmentDivisionHandler;
