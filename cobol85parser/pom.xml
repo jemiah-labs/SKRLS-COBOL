@@ -25,7 +25,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<exclude.tests>nothing.to.exclude</exclude.tests>
-		<antlr.version>4.7</antlr.version>
+		<antlr.version>4.7.2</antlr.version>
 	</properties>
 	<profiles>
 		<profile>

@@ -37,13 +37,15 @@ public class KDMSegment extends NativeFieldKeySorter {
 	private final String platform = "http://kdm.omg.org/platform";
 	@XStreamAsAttribute 
 	private String name;
-	
+
 	@XStreamAlias("model")
 	private DataModel dataModel;
+
+	@XStreamAlias("model")
+	private PlatformModel platformModel;
+
 	@XStreamImplicit
 	private List<CodeModel> codeModels;
-
-	private PlatformModel platformModel;
 	
 	public KDMSegment() {
 		codeModels = new ArrayList<CodeModel>();

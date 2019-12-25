@@ -65,11 +65,11 @@ public class DataDivisionHandler extends DivisionHandler {
 	
 	private DataElement processFileSection(FileSection fileSection) {
 		try {
+			List<FileDescriptionEntry> entries = fileSection.getFileDescriptionEntries();
+			
 			DataElement dataElement = new DataElement();
 			dataElement.setId(String.format("id.%s", Counter.getGlobalCounter().increment()));
 			dataElement.setType("data:DataAction");
-			List<FileDescriptionEntry> entries = fileSection.getFileDescriptionEntries();
-			
 			entries.forEach((fileEntry) -> {
 				DataElement dataElementInner = new DataElement(fileEntry.getName());
 				dataElementInner.setId(String.format("id.%s", Counter.getGlobalCounter().increment()));
@@ -91,14 +91,15 @@ public class DataDivisionHandler extends DivisionHandler {
 	
 	private DataElement processWorkingStorageSection(WorkingStorageSection workingStorageSection) {
 		try {
+			List<DataDescriptionEntry> entries = workingStorageSection
+				.getDataDescriptionEntries()
+				.get(0)
+				.getDataDescriptionEntryContainer()
+				.getDataDescriptionEntries();
+			
 			DataElement dataElement = new DataElement();
 			dataElement.setId(String.format("id.%s", Counter.getGlobalCounter().increment()));
 			dataElement.setType("data:DataAction");
-			List<DataDescriptionEntry> entries = workingStorageSection
-					.getDataDescriptionEntries()
-					.get(0)
-					.getDataDescriptionEntryContainer()
-					.getDataDescriptionEntries();
 			LinkedIterator<DataDescriptionEntry> sequence = new LinkedIterator<DataDescriptionEntry>(entries);
 			kindCurrent = StorableKind.LOCAL;
 			highLevelExtractData(sequence, sequence.hasNext() ? sequence.next() : null, dataElement);
@@ -114,17 +115,15 @@ public class DataDivisionHandler extends DivisionHandler {
 	
 	private DataElement processLinkageSection(LinkageSection linkageSection) {
 		try {
+			List<DataDescriptionEntry> entries = linkageSection.getDataDescriptionEntries();
+			
 			DataElement dataElement = new DataElement();
 			dataElement.setId(String.format("id.%s", Counter.getGlobalCounter().increment()));
 			dataElement.setType("data:DataAction");
-			List<DataDescriptionEntry> entries = linkageSection
-					.getDataDescriptionEntries();
-			
 			LinkedIterator<DataDescriptionEntry> current = new LinkedIterator<DataDescriptionEntry>(entries);
 			kindCurrent = StorableKind.EXTERNAL;
 			highLevelExtractData(current, current.hasNext() ? current.next() : null, dataElement);
 			return dataElement;
-			
 		} catch(NullPointerException ex) {
 			getMessageProducer().emitInfoMessage("Not Found LinkageSection");
 		} catch (Exception ex) {

@@ -13,11 +13,23 @@ import org.jemiahlabs.skrls.kdm.mapper.division.DivisionHandler;
 import org.jemiahlabs.skrls.kdm.models.KDMSegment;
 
 import io.proleap.cobol.asg.metamodel.CompilationUnit;
+import io.proleap.cobol.asg.metamodel.environment.inputoutput.InputOutputSection;
+import io.proleap.cobol.asg.metamodel.environment.inputoutput.filecontrol.AccessModeClause;
+import io.proleap.cobol.asg.metamodel.environment.inputoutput.filecontrol.AssignClause;
+import io.proleap.cobol.asg.metamodel.environment.inputoutput.filecontrol.FileControlEntry;
+import io.proleap.cobol.asg.metamodel.environment.inputoutput.filecontrol.OrganizationClause;
+import io.proleap.cobol.asg.metamodel.environment.inputoutput.filecontrol.SelectClause;
+import io.proleap.cobol.asg.metamodel.impl.LiteralImpl;
 import io.proleap.cobol.asg.metamodel.valuestmt.IntegerLiteralValueStmt;
+import io.proleap.cobol.asg.metamodel.valuestmt.impl.LiteralValueStmtImpl;
 import org.jemiahlabs.skrls.kdm.models.platform.Machine;
 import org.jemiahlabs.skrls.kdm.models.platform.PlatformModel;
+import org.jemiahlabs.skrls.kdm.models.platform.resources.DeployedResource;
+import org.jemiahlabs.skrls.kdm.models.platform.resources.ResourceType;
 import org.jemiahlabs.skrls.kdm.models.util.Counter;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public class EnvironmentDivisionHandler extends DivisionHandler {
@@ -34,7 +46,7 @@ public class EnvironmentDivisionHandler extends DivisionHandler {
 	public void process(CompilationUnit compilationUnit, KDMSegment model) {
 		getMessageProducer().emitInfoMessage("Extracting Environment Division");
 		EnvironmentDivision environmentDivision = compilationUnit.getProgramUnit().getEnvironmentDivision();
-		if(environmentDivision != null) {
+		if(Objects.nonNull(environmentDivision)) {
 			PlatformModel platformModel = createPlatformModel(environmentDivision);
 			model.setPlatformModel(platformModel);
 		}
@@ -45,14 +57,25 @@ public class EnvironmentDivisionHandler extends DivisionHandler {
 	private PlatformModel createPlatformModel(EnvironmentDivision environmentDivision) {
 		PlatformModel platformModel = new PlatformModel();
 		platformModel.setId(String.format("id.%s", Counter.getGlobalCounter().increment()));
+		platformModel.setType("platform:PlatformModel");
+
 		ConfigurationSection configSection = environmentDivision.getConfigurationSection();
-		platformModel.setMachine(processConfigurationSection(configSection));
+        if(Objects.nonNull(configSection)){
+            platformModel.setMachine(processConfigurationSection(configSection));
+        }
+
+        InputOutputSection ioSection = environmentDivision.getInputOutputSection();
+        if(Objects.nonNull(ioSection)){
+            platformModel.setDeployedResource(processInputOutputSection(ioSection));
+        }
 
 		return platformModel;
 	}
 
 	private Machine processConfigurationSection(ConfigurationSection configSection){
 		Machine machine = new Machine();
+		machine.setType("platform:Machine");
+		machine.setId(String.format("id.%s", Counter.getGlobalCounter().increment()));
 
 		ObjectComputerParagraph objectComputerParagraph = configSection.getObjectComputerParagraph();
 		if(Objects.nonNull(objectComputerParagraph)){
@@ -113,4 +136,54 @@ public class EnvironmentDivisionHandler extends DivisionHandler {
 	    return sourceComputerParagraph.isDebuggingMode();
     }
 
+    private DeployedResource processInputOutputSection(InputOutputSection ioSection){
+	    DeployedResource deployedResource = new DeployedResource();
+	    deployedResource.setId(String.format("id.%s", Counter.getGlobalCounter().increment()));
+        List<ResourceType> resources = new ArrayList<>();
+        List<FileControlEntry> fileControlEntries = ioSection.getFileControlParagraph().getFileControlEntries();
+        fileControlEntries.forEach(fileControlEntry -> {
+
+            ResourceType resource = new ResourceType();
+            SelectClause selectClause = fileControlEntry.getSelectClause();
+            if(Objects.nonNull(selectClause)){
+                resource.setName(selectClause.getName());
+            }
+
+            AssignClause assignClause = fileControlEntry.getAssignClause();
+            if(Objects.nonNull(assignClause)){
+                resource.setSource(getResourceSource(assignClause));
+                AssignClause.AssignClauseType clauseType = assignClause.getAssignClauseType();
+                if(Objects.nonNull(clauseType)){
+                    resource.setKind(clauseType.name());
+                }
+            }
+
+            AccessModeClause accessModeClause = fileControlEntry.getAccessModeClause();
+            if(Objects.nonNull(accessModeClause)){
+                AccessModeClause.Mode mode = accessModeClause.getMode();
+                if(Objects.nonNull(mode)){
+                    resource.setAccessMethod(mode.name());
+                }
+            }
+
+            OrganizationClause organizationClause = fileControlEntry.getOrganizationClause();
+            if(Objects.nonNull(organizationClause)){
+                OrganizationClause.Mode mode = organizationClause.getMode();
+                if(Objects.nonNull(mode)){
+                    resource.setOrganization(mode.name());
+                }
+            }
+
+            resource.setId(String.format("id.%s", Counter.getGlobalCounter().increment()));
+            resources.add(resource);
+        });
+        deployedResource.setResources(resources);
+        return deployedResource;
+    }
+
+    private String getResourceSource(AssignClause assignClause){
+	    LiteralValueStmtImpl literal = (LiteralValueStmtImpl) assignClause.getToValueStmt();
+	    LiteralImpl literalImp = (LiteralImpl) literal.getLiteral();
+	    return literalImp.getNonNumericLiteral();
+    }
 }
