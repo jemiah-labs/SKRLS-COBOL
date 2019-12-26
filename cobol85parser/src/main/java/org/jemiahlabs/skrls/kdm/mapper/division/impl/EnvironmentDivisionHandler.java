@@ -55,6 +55,7 @@ public class EnvironmentDivisionHandler extends DivisionHandler {
 	}
 
 	private PlatformModel createPlatformModel(EnvironmentDivision environmentDivision) {
+	    getMessageProducer().emitInfoMessage("Processing platform model");
 		PlatformModel platformModel = new PlatformModel();
 		platformModel.setId(String.format("id.%s", Counter.getGlobalCounter().increment()));
 		platformModel.setType("platform:PlatformModel");
@@ -73,6 +74,7 @@ public class EnvironmentDivisionHandler extends DivisionHandler {
 	}
 
 	private Machine processConfigurationSection(ConfigurationSection configSection){
+	    getMessageProducer().emitInfoMessage("Processing configuration section");
 		Machine machine = new Machine();
 		machine.setType("platform:Machine");
 		machine.setId(String.format("id.%s", Counter.getGlobalCounter().increment()));
@@ -137,6 +139,7 @@ public class EnvironmentDivisionHandler extends DivisionHandler {
     }
 
     private DeployedResource processInputOutputSection(InputOutputSection ioSection){
+        getMessageProducer().emitInfoMessage("Processing input output section");
 	    DeployedResource deployedResource = new DeployedResource();
 	    deployedResource.setId(String.format("id.%s", Counter.getGlobalCounter().increment()));
         List<ResourceType> resources = new ArrayList<>();
