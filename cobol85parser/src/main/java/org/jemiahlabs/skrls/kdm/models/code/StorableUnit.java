@@ -26,6 +26,11 @@ public class StorableUnit extends XmiEntity {
 		itemUnits = new ArrayList<ItemUnit>();
 	}
 	
+	public StorableUnit() {
+		storableUnits = new ArrayList<StorableUnit>();
+		itemUnits = new ArrayList<ItemUnit>();
+	}
+	
 	public void addStorableUnit(StorableUnit storableUnit) {
 		storableUnits.add(storableUnit);
 	}
