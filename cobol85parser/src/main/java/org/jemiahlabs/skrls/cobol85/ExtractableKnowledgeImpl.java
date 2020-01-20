@@ -82,7 +82,7 @@ public class ExtractableKnowledgeImpl implements ExtractableKnowledge {
 		String xml = xstream.toXML(model);
 		String formatedXML = formatXML(xml);
 		try {
-			saveFile(formatedXML, Paths.get(outputDirFile.getAbsolutePath(), model.getName() + ".xml").toFile());
+			saveFile(formatedXML, Paths.get(outputDirFile.getAbsolutePath(), model.getName() + ".xmi.kdm").toFile());
 			producer.emitInfoMessage("Generated file " + model.getName());
 		} catch (IOException e) {
 			producer.emitErrorMessage("Error in XML Write: " + e.getMessage());
