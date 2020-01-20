@@ -3,6 +3,7 @@ package org.jemiahlabs.skrls.kdm.mapper.division.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.antlr.v4.runtime.ParserRuleContext;
 import org.jemiahlabs.skrls.core.Producer;
 import org.jemiahlabs.skrls.kdm.mapper.division.DivisionHandler;
 import org.jemiahlabs.skrls.kdm.models.KDMSegment;
@@ -16,7 +17,10 @@ import org.jemiahlabs.skrls.kdm.models.util.Counter;
 import org.jemiahlabs.skrls.kdm.models.util.LinkedIterator;
 
 import io.proleap.cobol.asg.metamodel.CompilationUnit;
+import io.proleap.cobol.asg.metamodel.NamedElement;
 import io.proleap.cobol.asg.metamodel.data.DataDivision;
+import io.proleap.cobol.asg.metamodel.data.database.DataBaseSection;
+import io.proleap.cobol.asg.metamodel.data.database.DataBaseSectionEntry;
 import io.proleap.cobol.asg.metamodel.data.datadescription.DataDescriptionEntry;
 import io.proleap.cobol.asg.metamodel.data.datadescription.DataDescriptionEntryGroup;
 import io.proleap.cobol.asg.metamodel.data.datadescription.PictureClause;
@@ -24,6 +28,14 @@ import io.proleap.cobol.asg.metamodel.data.datadescription.ValueClause;
 import io.proleap.cobol.asg.metamodel.data.file.FileDescriptionEntry;
 import io.proleap.cobol.asg.metamodel.data.file.FileSection;
 import io.proleap.cobol.asg.metamodel.data.linkage.LinkageSection;
+import io.proleap.cobol.asg.metamodel.data.report.FirstDetailClause;
+import io.proleap.cobol.asg.metamodel.data.report.FootingClause;
+import io.proleap.cobol.asg.metamodel.data.report.HeadingClause;
+import io.proleap.cobol.asg.metamodel.data.report.LastDetailClause;
+import io.proleap.cobol.asg.metamodel.data.report.PageLimitClause;
+import io.proleap.cobol.asg.metamodel.data.report.ReportDescription;
+import io.proleap.cobol.asg.metamodel.data.report.ReportGroupDescriptionEntry;
+import io.proleap.cobol.asg.metamodel.data.report.ReportSection;
 import io.proleap.cobol.asg.metamodel.data.workingstorage.WorkingStorageSection;
 
 public class DataDivisionHandler extends DivisionHandler {
@@ -56,11 +68,54 @@ public class DataDivisionHandler extends DivisionHandler {
 		sections.add(processFileSection(dataDivision.getFileSection()));
 		sections.add(processWorkingStorageSection(dataDivision.getWorkingStorageSection()));
 		sections.add(processLinkageSection(dataDivision.getLinkageSection()));
+		sections.add(processDatabaseSection(dataDivision.getDataBaseSection()));
+		sections.add(processReportSection(dataDivision.getReportSection()));
 		sections.forEach(section -> {
 			if(section != null)
 				dataModel.addDataElement(section);
 		});
 		return dataModel;
+	}
+	
+	
+	private DataElement processReportSection(ReportSection reportSection) {
+		try {
+			List<ReportDescription> entries = reportSection.getReportDescriptions();
+			DataElement dataElement = new DataElement();
+			dataElement.setId(String.format("id.%s", Counter.getGlobalCounter().increment()));
+			dataElement.setType("data:DataAction");			
+			entries.forEach((reportDescription) -> {
+				dataElement.addDataElement(processReportDescription(reportDescription));
+			});			
+			return dataElement;
+		} catch(NullPointerException ex) {
+			getMessageProducer().emitInfoMessage("Not Found ReportSection");
+		} catch (Exception ex) {
+			getMessageProducer().emitInfoMessage(ex.getMessage());
+		}
+		return null;
+	}
+	
+	private DataElement processDatabaseSection(DataBaseSection databaseSection) {
+		try {
+			List<DataBaseSectionEntry> entries = databaseSection.getDataBaseSectionEntries();			
+			DataElement dataElement = new DataElement();
+			dataElement.setId(String.format("id.%s", Counter.getGlobalCounter().increment()));
+			dataElement.setType("data:DataEvent");			
+			entries.forEach((entry) -> {
+				String name = entry.getValueStmt1().getCtx().getText();
+				String ext = entry.getValueStmt2().getCtx().getText();
+				ItemUnit itemUnit = new ItemUnit(name, ext);
+				itemUnit.setId(String.format("id.%s", Counter.getGlobalCounter().increment()));
+				dataElement.addItemUnit(itemUnit);
+			});			
+			return dataElement;
+		} catch(NullPointerException ex) {
+			getMessageProducer().emitInfoMessage("Not Found DataBaseSection");
+		} catch (Exception ex) {
+			getMessageProducer().emitInfoMessage(ex.getMessage());
+		}
+		return null;
 	}
 	
 	private DataElement processFileSection(FileSection fileSection) {
@@ -108,8 +163,7 @@ public class DataDivisionHandler extends DivisionHandler {
 			getMessageProducer().emitInfoMessage("Not Found WorkingStorageSection");
 		} catch (Exception ex) {
 			getMessageProducer().emitInfoMessage(ex.getMessage());
-		}
-		
+		}		
 		return null;
 	}
 	
@@ -130,6 +184,100 @@ public class DataDivisionHandler extends DivisionHandler {
 			getMessageProducer().emitInfoMessage(ex.getMessage());
 		}
 		return null;
+	}
+	
+	private DataElement processReportDescription(ReportDescription reportDescription) {
+		DataElement dataElement = new DataElement();
+		dataElement.setName(reportDescription.getName());
+		dataElement.setId(String.format("id.%s", Counter.getGlobalCounter().increment()));
+		dataElement.setType("data:DataAction");
+		
+		addReportHeadingIfExist(reportDescription.getReportDescriptionEntry().getHeadingClause(), dataElement);
+		addReportFootingIfExist(reportDescription.getReportDescriptionEntry().getFootingClause(), dataElement);
+		addReportFirstDetailIfExist(reportDescription.getReportDescriptionEntry().getFirstDetailClause(), dataElement);
+		addReportLastDetailIfExist(reportDescription.getReportDescriptionEntry().getLastDetailClause(), dataElement);
+		addReportPageLimitIfExist(reportDescription.getReportDescriptionEntry().getPageLimitClause(), dataElement);
+		
+		if(reportDescription.getRootReportGroupDescriptionEntries().size() > 0) {
+			StorableUnit storableUnit = new StorableUnit();
+			storableUnit.setId(String.format("id.%s", Counter.getGlobalCounter().increment()));
+			reportDescription.getRootReportGroupDescriptionEntries().forEach(entry -> {
+				List<ReportGroupDescriptionEntry> entries = entry.getReportGroupDescriptionEntries();
+				if(entries != null && entries.size() > 0) {
+					extractReportGroupDescriptionEntries(entry, storableUnit);
+				} else {
+					extractReportGroupDescriptionEntry(entry, storableUnit);
+				}
+			});
+			dataElement.addStorableUnit(storableUnit);
+		}
+		
+		return dataElement;
+	}
+	
+	private void addReportHeadingIfExist(HeadingClause clause, DataElement root) {
+		if(clause == null) return;
+		
+		ItemUnit itemUnit = new ItemUnit("HEADING", extractTokens(clause.getCtx()));
+		itemUnit.setId(String.format("id.%s", Counter.getGlobalCounter().increment()));
+		itemUnit.setValueElement(new ValueElement(""+clause.getHeadingIntegerLiteral().getValue()));
+		root.addItemUnit(itemUnit);
+	}
+	
+	private void addReportFootingIfExist(FootingClause clause, DataElement root) {
+		if(clause == null) return;
+		
+		ItemUnit itemUnit = new ItemUnit("FOOTING", extractTokens(clause.getCtx()));
+		itemUnit.setId(String.format("id.%s", Counter.getGlobalCounter().increment()));
+		itemUnit.setValueElement(new ValueElement(""+clause.getFootingIntegerLiteral().getValue()));
+		root.addItemUnit(itemUnit);
+	}
+	
+	private void addReportFirstDetailIfExist(FirstDetailClause clause, DataElement root) {
+		if(clause == null) return;
+		
+		ItemUnit itemUnit = new ItemUnit("FIRST_DETAIL", extractTokens(clause.getCtx()));
+		itemUnit.setId(String.format("id.%s", Counter.getGlobalCounter().increment()));
+		itemUnit.setValueElement(new ValueElement(""+clause.getFirstDetailIntegerLiteral().getValue()));
+		root.addItemUnit(itemUnit);
+	}
+	
+	private void addReportLastDetailIfExist(LastDetailClause clause, DataElement root) {
+		if(clause == null) return;
+		
+		ItemUnit itemUnit = new ItemUnit("LAST_DETAIL", extractTokens(clause.getCtx()));
+		itemUnit.setId(String.format("id.%s", Counter.getGlobalCounter().increment()));
+		itemUnit.setValueElement(new ValueElement(""+clause.getLastDetailIntegerLiteral().getValue()));
+		root.addItemUnit(itemUnit);
+	}
+	
+	private void addReportPageLimitIfExist(PageLimitClause clause, DataElement root) {
+		if(clause == null) return;
+		
+		ItemUnit itemUnit = new ItemUnit("PAGE_LIMITS", extractTokens(clause.getCtx()));
+		itemUnit.setId(String.format("id.%s", Counter.getGlobalCounter().increment()));
+		root.addItemUnit(itemUnit);
+	}
+	
+	private void extractReportGroupDescriptionEntries(ReportGroupDescriptionEntry reportGroupDescriptionEntry, StorableUnit root) {
+		StorableUnit storableUnit = new StorableUnit(reportGroupDescriptionEntry.getName());
+		storableUnit.setKind(StorableKind.LOCAL);
+		storableUnit.setId(String.format("id.%s", Counter.getGlobalCounter().increment()));
+		root.addStorableUnit(storableUnit);
+		
+		reportGroupDescriptionEntry.getReportGroupDescriptionEntries().forEach(entry -> {
+			List<ReportGroupDescriptionEntry> reportGroupDescriptionEntryInner = entry.getReportGroupDescriptionEntries();
+			if(reportGroupDescriptionEntryInner != null && reportGroupDescriptionEntryInner.size() > 0) {
+				extractReportGroupDescriptionEntries(entry, storableUnit);
+			} else {
+				extractReportGroupDescriptionEntry(entry, storableUnit);
+			}
+		});		
+	}
+	
+	private void extractReportGroupDescriptionEntry(ReportGroupDescriptionEntry reportGroupDescriptionEntry, StorableUnit root) {
+		ItemUnit itemUnit = createItemUnit(reportGroupDescriptionEntry);		
+		root.addItemUnit(itemUnit);
 	}
 	
 	private void highLevelExtractData(LinkedIterator<DataDescriptionEntry> sequence, DataDescriptionEntry after, DataElement store) {
@@ -168,10 +316,7 @@ public class DataDivisionHandler extends DivisionHandler {
 		String ext = "";
 		PictureClause picture = ((DataDescriptionEntryGroup)dataDescriptionEntry).getPictureClause();
 		if(picture != null) {
-			String[] tokens = (String[]) picture.getCtx().children.stream()
-					.map( p -> p.getText())
-					.toArray(String[]::new);
-			ext = String.join(" ", tokens);
+			ext = extractTokens(picture.getCtx());
 		}
 		
 		ItemUnit itemUnit = new ItemUnit(dataDescriptionEntry.getName(), ext);
@@ -184,12 +329,34 @@ public class DataDivisionHandler extends DivisionHandler {
 			itemUnit.setValueElement(valueElement);
 		}
 		return itemUnit;
+	}	
+	
+	private ItemUnit createItemUnit(ReportGroupDescriptionEntry reportGroupDescriptionEntry) {
+		String ext = extractTokens(reportGroupDescriptionEntry.getCtx()); 
+		ItemUnit itemUnit = new ItemUnit(reportGroupDescriptionEntry.getName(), ext);
+		itemUnit.setId(String.format("id.%s", Counter.getGlobalCounter().increment()));
+		if (reportGroupDescriptionEntry.getUsageClause() != null)
+			itemUnit.setLabel(reportGroupDescriptionEntry.getUsageClause().getUsageClauseType().name());
+		
+		
+		return itemUnit;
 	}
 	
-	private StorableUnit createStorableUnit(DataDescriptionEntry dataDescriptionEntry) {
-		StorableUnit storableUnit = new StorableUnit(dataDescriptionEntry.getName());
+	private StorableUnit createStorableUnit(NamedElement namedElement) {
+		return createStorableUnit(namedElement, kindCurrent);
+	}
+	
+	private StorableUnit createStorableUnit(NamedElement namedElement, StorableKind storableKind) {
+		StorableUnit storableUnit = new StorableUnit(namedElement.getName());
 		storableUnit.setId(String.format("id.%s", Counter.getGlobalCounter().increment()));
-		storableUnit.setKind(kindCurrent);
+		storableUnit.setKind(storableKind);
 		return storableUnit;
+	}
+	
+	private String extractTokens(ParserRuleContext parserRuleContext) {
+		String[] tokens = (String[]) parserRuleContext.children.stream()
+				.map( p -> p.getText())
+				.toArray(String[]::new);
+		return String.join(" ", tokens).trim();
 	}
 }
