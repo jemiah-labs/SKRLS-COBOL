@@ -63,6 +63,8 @@ public class ExtractableKnowledgeImpl implements ExtractableKnowledge {
 				
 			} catch (IOException e) {
 				producer.emitWarningMessage(e.getMessage());
+			} catch (RuntimeException ex) {
+				producer.emitErrorMessage(ex.getMessage());
 			}
 		});
 		
