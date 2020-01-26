@@ -35,6 +35,6 @@ public class BooleanLiteralValueStmtImpl extends ValueStmtImpl implements Boolea
 
 	@Override
 	public String toString() {
-		return booleanLiteral != null ? booleanLiteral.toString() : null;
+		return booleanLiteral != null ? booleanLiteral.getValue().toString() : null;
 	}
 }

@@ -35,6 +35,6 @@ public class IntegerLiteralValueStmtImpl extends ValueStmtImpl implements Intege
 
 	@Override
 	public String toString() {
-		return integerLiteral != null ? integerLiteral.toString() : null;
+		return integerLiteral != null ? integerLiteral.getValue().toString() : null;
 	}
 }

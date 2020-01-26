@@ -17,11 +17,11 @@ import io.proleap.cobol.asg.metamodel.environment.inputoutput.InputOutputSection
 import io.proleap.cobol.asg.metamodel.environment.inputoutput.filecontrol.AccessModeClause;
 import io.proleap.cobol.asg.metamodel.environment.inputoutput.filecontrol.AssignClause;
 import io.proleap.cobol.asg.metamodel.environment.inputoutput.filecontrol.FileControlEntry;
+import io.proleap.cobol.asg.metamodel.environment.inputoutput.filecontrol.FileControlParagraph;
 import io.proleap.cobol.asg.metamodel.environment.inputoutput.filecontrol.OrganizationClause;
 import io.proleap.cobol.asg.metamodel.environment.inputoutput.filecontrol.SelectClause;
-import io.proleap.cobol.asg.metamodel.impl.LiteralImpl;
 import io.proleap.cobol.asg.metamodel.valuestmt.IntegerLiteralValueStmt;
-import io.proleap.cobol.asg.metamodel.valuestmt.impl.LiteralValueStmtImpl;
+import io.proleap.cobol.asg.metamodel.valuestmt.ValueStmt;
 import org.jemiahlabs.skrls.kdm.models.platform.Machine;
 import org.jemiahlabs.skrls.kdm.models.platform.PlatformModel;
 import org.jemiahlabs.skrls.kdm.models.platform.resources.DeployedResource;
@@ -143,50 +143,55 @@ public class EnvironmentDivisionHandler extends DivisionHandler {
 	    DeployedResource deployedResource = new DeployedResource();
 	    deployedResource.setId(String.format("id.%s", Counter.getGlobalCounter().increment()));
         List<ResourceType> resources = new ArrayList<>();
-        List<FileControlEntry> fileControlEntries = ioSection.getFileControlParagraph().getFileControlEntries();
-        fileControlEntries.forEach(fileControlEntry -> {
+        FileControlParagraph fileControlParagraph = ioSection.getFileControlParagraph();
+        if(Objects.nonNull(fileControlParagraph)){
+            List<FileControlEntry> fileControlEntries = fileControlParagraph.getFileControlEntries();
+            fileControlEntries.forEach(fileControlEntry -> {
 
-            ResourceType resource = new ResourceType();
-            SelectClause selectClause = fileControlEntry.getSelectClause();
-            if(Objects.nonNull(selectClause)){
-                resource.setName(selectClause.getName());
-            }
-
-            AssignClause assignClause = fileControlEntry.getAssignClause();
-            if(Objects.nonNull(assignClause)){
-                resource.setSource(getResourceSource(assignClause));
-                AssignClause.AssignClauseType clauseType = assignClause.getAssignClauseType();
-                if(Objects.nonNull(clauseType)){
-                    resource.setKind(clauseType.name());
+                ResourceType resource = new ResourceType();
+                SelectClause selectClause = fileControlEntry.getSelectClause();
+                if(Objects.nonNull(selectClause)){
+                    resource.setName(selectClause.getName());
                 }
-            }
 
-            AccessModeClause accessModeClause = fileControlEntry.getAccessModeClause();
-            if(Objects.nonNull(accessModeClause)){
-                AccessModeClause.Mode mode = accessModeClause.getMode();
-                if(Objects.nonNull(mode)){
-                    resource.setAccessMethod(mode.name());
+                AssignClause assignClause = fileControlEntry.getAssignClause();
+                if(Objects.nonNull(assignClause)){
+                    resource.setSource(getResourceSource(assignClause));
+                    AssignClause.AssignClauseType clauseType = assignClause.getAssignClauseType();
+                    if(Objects.nonNull(clauseType)){
+                        resource.setKind(clauseType.name());
+                    }
                 }
-            }
 
-            OrganizationClause organizationClause = fileControlEntry.getOrganizationClause();
-            if(Objects.nonNull(organizationClause)){
-                OrganizationClause.Mode mode = organizationClause.getMode();
-                if(Objects.nonNull(mode)){
-                    resource.setOrganization(mode.name());
+                AccessModeClause accessModeClause = fileControlEntry.getAccessModeClause();
+                if(Objects.nonNull(accessModeClause)){
+                    AccessModeClause.Mode mode = accessModeClause.getMode();
+                    if(Objects.nonNull(mode)){
+                        resource.setAccessMethod(mode.name());
+                    }
                 }
-            }
 
-            resource.setId(String.format("id.%s", Counter.getGlobalCounter().increment()));
-            resources.add(resource);
-        });
+                OrganizationClause organizationClause = fileControlEntry.getOrganizationClause();
+                if(Objects.nonNull(organizationClause)){
+                    OrganizationClause.Mode mode = organizationClause.getMode();
+                    if(Objects.nonNull(mode)){
+                        resource.setOrganization(mode.name());
+                    }
+                }
+
+                resource.setId(String.format("id.%s", Counter.getGlobalCounter().increment()));
+                resources.add(resource);
+            });
+        }
         deployedResource.setResources(resources);
         return deployedResource;
     }
 
     private String getResourceSource(AssignClause assignClause){
-	    LiteralValueStmtImpl literal = (LiteralValueStmtImpl) assignClause.getToValueStmt();
-	    LiteralImpl literalImp = (LiteralImpl) literal.getLiteral();
-	    return literalImp.getNonNumericLiteral();
+	    ValueStmt stmtImpl = assignClause.getToValueStmt();
+	    if(Objects.nonNull(stmtImpl)){
+	        return stmtImpl.toString();
+        }
+	    return null;
     }
 }

@@ -62,9 +62,9 @@ public class ExtractableKnowledgeImpl implements ExtractableKnowledge {
 				});
 				
 			} catch (IOException e) {
-				producer.emitWarningMessage(e.getMessage());
+				producer.emitWarningMessage(file.getName() + ": " + e.getMessage());
 			} catch (RuntimeException ex) {
-				producer.emitErrorMessage(ex.getMessage());
+				producer.emitErrorMessage(file.getName() + ": " + ex.getMessage());
 			}
 		});
 		
